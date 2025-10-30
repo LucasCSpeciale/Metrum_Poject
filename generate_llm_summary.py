@@ -7,11 +7,17 @@ Uses Claude via OpenRouter to generate a human-readable analysis
 import json
 import csv
 import requests
+import os
 from pathlib import Path
 from datetime import datetime
 
 # Configuration
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+if not OPENROUTER_API_KEY:
+    print("ERROR: OPENROUTER_API_KEY environment variable not set!")
+    print("Please set it with: export OPENROUTER_API_KEY='your-key-here'")
+    exit(1)
+
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 CLAUDE_MODEL = "anthropic/claude-3.5-sonnet"  # Using Claude 3.5 Sonnet for high-quality analysis
 

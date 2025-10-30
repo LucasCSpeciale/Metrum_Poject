@@ -13,7 +13,12 @@ from pathlib import Path
 from datetime import datetime
 
 # Configuration
-OPENROUTER_API_KEY = "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"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
+if not OPENROUTER_API_KEY:
+    print("ERROR: OPENROUTER_API_KEY environment variable not set!")
+    print("Please set it with: export OPENROUTER_API_KEY='your-key-here'")
+    exit(1)
+
 DOCKER_IMAGE = "nvcr.io/nvidia/tritonserver:25.01-py3-sdk"  # Has genai-perf 0.0.10 with -H flag support
 
 ##TODO: do not hardcode models, create a CLI tool that allows you to run the benchmark while take the model as an argument

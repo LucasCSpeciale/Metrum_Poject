@@ -33,11 +33,41 @@ Currently configured to test:
 
 - **Python 3.7+**
 - **Docker Desktop** - Must be running
-- **OpenRouter API Key** - Already configured in `benchmark.py`
+- **OpenRouter API Key** - Get one at https://openrouter.ai/keys
 
 ## Installation
 
-### Step 1: Install Python Dependencies
+### Step 1: Get an OpenRouter API Key
+
+1. Go to https://openrouter.ai/
+2. Sign up or log in
+3. Navigate to **Keys** in the sidebar
+4. Click **Create Key** and copy it
+5. Add credits to your account (at least $5 recommended)
+
+### Step 2: Set Your API Key
+
+**Option A: Export as environment variable (temporary)**
+```bash
+export OPENROUTER_API_KEY='sk-or-v1-your-key-here'
+```
+
+**Option B: Add to your shell profile (permanent)**
+```bash
+# Add to ~/.zshrc or ~/.bashrc
+echo 'export OPENROUTER_API_KEY="sk-or-v1-your-key-here"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+**Option C: Use a .env file (recommended)**
+```bash
+cp .env.example .env
+# Edit .env and add your key
+```
+
+**IMPORTANT:** Never commit your actual API key to git!
+
+### Step 3: Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -48,7 +78,7 @@ This installs:
 - `flask` - Web server for dashboard
 - `requests` - HTTP client
 
-### Step 2: Verify Docker is Running
+### Step 4: Verify Docker is Running
 
 ```bash
 docker --version
@@ -195,14 +225,6 @@ cmd = [
 ```
 
 **Note:** Increasing `--num-prompts` will increase cost and runtime.
-
-### Changing the API Key
-
-Edit `OPENROUTER_API_KEY` in `benchmark.py`:
-
-```python
-OPENROUTER_API_KEY = "sk-or-v1-your-key-here"
-```
 
 ## AI-Powered Summary
 
