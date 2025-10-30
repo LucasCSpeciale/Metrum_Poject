@@ -5,13 +5,18 @@ A benchmarking tool for comparing LLM performance using OpenRouter and NVIDIA Ge
 ## Quick Start
 
 ```bash
-# Install dependencies
+# 1. Get OpenRouter API key at https://openrouter.ai/keys
+
+# 2. Set your API key
+export OPENROUTER_API_KEY='sk-or-v1-your-key-here'
+
+# 3. Install dependencies
 pip install -r requirements.txt
 
-# Start the web dashboard
+# 4. Start the web dashboard
 ./start_web_dashboard.sh
 
-# Open http://localhost:3000 in your browser
+# 5. Open http://localhost:3000 in your browser
 ```
 
 Use the web interface to run benchmarks and view results.
@@ -47,22 +52,16 @@ Currently configured to test:
 
 ### Step 2: Set Your API Key
 
-**Option A: Export as environment variable (temporary)**
+**Option A: Temporary (for current terminal session)**
 ```bash
 export OPENROUTER_API_KEY='sk-or-v1-your-key-here'
 ```
 
-**Option B: Add to your shell profile (permanent)**
+**Option B: Permanent (survives terminal restarts)**
 ```bash
-# Add to ~/.zshrc or ~/.bashrc
+# Add to ~/.zshrc (macOS) or ~/.bashrc (Linux)
 echo 'export OPENROUTER_API_KEY="sk-or-v1-your-key-here"' >> ~/.zshrc
 source ~/.zshrc
-```
-
-**Option C: Use a .env file (recommended)**
-```bash
-cp .env.example .env
-# Edit .env and add your key
 ```
 
 **IMPORTANT:** Never commit your actual API key to git!
