@@ -246,6 +246,16 @@ def main():
     
     # Step 3: Automatically generate LLM summary
     generate_llm_summary()
+    
+    # Step 4: Inform user about web dashboard
+    print("\n" + "="*60)
+    print("VIEW RESULTS IN WEB DASHBOARD")
+    print("="*60)
+    print("\nTo view your benchmark results in an interactive dashboard:")
+    print("\n  1. Run: bash start_web_dashboard.sh")
+    print("     or:  python web_app.py")
+    print("\n  2. Open your browser to: http://localhost:3000")
+    print("\n" + "="*60 + "\n")
 
 
 if __name__ == "__main__":
