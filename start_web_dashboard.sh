@@ -9,6 +9,15 @@ if [ ! -d "venv" ]; then
     exit 1
 fi
 
+# Check if port 3000 is in use and kill it
+PORT=3000
+if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null 2>&1 ; then
+    echo "Port $PORT is already in use. Stopping existing process..."
+    lsof -ti:$PORT | xargs kill -9 2>/dev/null
+    echo "Existing process stopped."
+    echo ""
+fi
+
 echo "==========================================="
 echo "Starting LLM Benchmark Web Dashboard"
 echo "==========================================="
