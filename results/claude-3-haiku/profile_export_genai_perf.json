@@ -1,0 +1,132 @@
+{
+  "request_throughput": {
+    "unit": "requests/sec",
+    "avg": 0.4591801800048545
+  },
+  "request_latency": {
+    "unit": "ms",
+    "avg": 2177.6288354747476,
+    "p25": 1763.6235844999999,
+    "p50": 2072.838835,
+    "p75": 2422.727293,
+    "p90": 2790.507276,
+    "p95": 2987.9470468999993,
+    "p99": 6368.029799659997,
+    "min": 957.454292,
+    "max": 7033.929835999999,
+    "std": 820.9199768790123
+  },
+  "request_count": {
+    "unit": "count",
+    "avg": 99.0
+  },
+  "time_to_first_token": {
+    "unit": "ms",
+    "avg": 2177.6288354747476,
+    "p25": 1763.6235844999999,
+    "p50": 2072.838835,
+    "p75": 2422.727293,
+    "p90": 2790.507276,
+    "p95": 2987.9470468999993,
+    "p99": 6368.029799659997,
+    "min": 957.454292,
+    "max": 7033.929835999999,
+    "std": 820.9199768790123
+  },
+  "output_token_throughput": {
+    "unit": "tokens/sec",
+    "avg": 92.08649791733718
+  },
+  "output_token_throughput_per_request": {
+    "unit": "tokens/sec",
+    "avg": 93.90215424410717,
+    "p25": 86.00943721980242,
+    "p50": 97.95943346770011,
+    "p75": 106.31980651251962,
+    "p90": 112.98617854382141,
+    "p95": 116.10006609636453,
+    "p99": 122.16218007369869,
+    "min": 24.026398320758,
+    "max": 124.70054814414847,
+    "std": 18.599001793758752
+  },
+  "output_sequence_length": {
+    "unit": "tokens",
+    "avg": 200.54545454545453,
+    "p25": 161.0,
+    "p50": 207.0,
+    "p75": 245.5,
+    "p90": 266.2,
+    "p95": 277.59999999999997,
+    "p99": 307.4999999999999,
+    "min": 52.0,
+    "max": 332.0,
+    "std": 59.808325613347314
+  },
+  "input_sequence_length": {
+    "unit": "tokens",
+    "avg": 50.0,
+    "p25": 50.0,
+    "p50": 50.0,
+    "p75": 50.0,
+    "p90": 50.0,
+    "p95": 50.0,
+    "p99": 50.0,
+    "min": 50.0,
+    "max": 50.0,
+    "std": 0.0
+  },
+  "input_config": {
+    "subcommand": "profile",
+    "model": [
+      "anthropic/claude-3-haiku"
+    ],
+    "model_selection_strategy": "round_robin",
+    "backend": "tensorrtllm",
+    "endpoint": "v1/chat/completions",
+    "endpoint_type": "chat",
+    "service_kind": "openai",
+    "server_metrics_url": null,
+    "streaming": false,
+    "u": "https://openrouter.ai/api",
+    "image_width_mean": 100,
+    "image_width_stddev": 0,
+    "image_height_mean": 100,
+    "image_height_stddev": 0,
+    "image_format": null,
+    "batch_size_image": 1,
+    "batch_size_text": 1,
+    "goodput": null,
+    "header": [
+      "Authorization:Bearer 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",
+      "HTTP-Referer:http://localhost:8000",
+      "X-Title:GenAI-Perf-Benchmark"
+    ],
+    "num_dataset_entries": 10,
+    "num_prefix_prompts": 0,
+    "output_tokens_mean": -1,
+    "output_tokens_mean_deterministic": false,
+    "output_tokens_stddev": 0,
+    "random_seed": 0,
+    "request_count": 0,
+    "synthetic_input_tokens_mean": 50,
+    "synthetic_input_tokens_stddev": 0,
+    "prefix_prompt_length": 100,
+    "warmup_request_count": 0,
+    "verbose": false,
+    "artifact_dir": "/workspace/results/claude-3-haiku",
+    "generate_plots": false,
+    "profile_export_file": "/workspace/results/claude-3-haiku/profile_export.json",
+    "concurrency": 1,
+    "measurement_interval": 60000,
+    "request_rate": null,
+    "stability_percentage": 999,
+    "tokenizer": "gpt2",
+    "tokenizer_revision": "main",
+    "tokenizer_trust_remote_code": false,
+    "synthetic_input_files": null,
+    "prompt_source": "synthetic",
+    "formatted_model_name": "anthropic/claude-3-haiku",
+    "extra_inputs": {}
+  }
+}

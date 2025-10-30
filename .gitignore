@@ -1,0 +1,47 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+
+# Results (optional - uncomment if you don't want to share benchmark results)
+# results/
+# benchmark_data_summary.json
+# LLM_GENERATED_SUMMARY.md
+
+# Jupyter Notebook
+.ipynb_checkpoints

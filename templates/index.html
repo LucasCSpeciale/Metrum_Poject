@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Benchmark Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background: #1a1a1a;
+            min-height: 100vh;
+            padding: 20px;
+            color: #ffffff;
+        }
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .card {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        .card-body {
+            color: #ffffff;
+        }
+        .card-title {
+            color: #10b981;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .metric-card {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: #10b981;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #10b981;
+        }
+        .metric-label {
+            color: #9ca3af;
+            font-size: 0.9em;
+        }
+        .model-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+        .winner { background: #10b981; color: white; }
+        .second { background: #6b7280; color: white; }
+        .third { background: #4b5563; color: white; }
+        .btn-run-benchmark {
+            background: #10b981;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            color: white;
+        }
+        .btn-run-benchmark:hover {
+            background: #059669;
+        }
+        .btn-info {
+            background: #6b7280;
+            border: none;
+            color: white;
+        }
+        .btn-info:hover {
+            background: #4b5563;
+        }
+        .btn-success {
+            background: #10b981;
+            border: none;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-secondary {
+            background: #4b5563;
+            border: none;
+        }
+        .btn-secondary:hover {
+            background: #374151;
+        }
+        .btn-outline-primary {
+            border-color: #10b981;
+            color: #10b981;
+        }
+        .btn-outline-primary:hover {
+            background: #10b981;
+            color: white;
+        }
+        .table {
+            color: #ffffff;
+        }
+        .table thead {
+            background: #374151;
+        }
+        .table-hover tbody tr:hover {
+            background: #374151;
+        }
+        .status-running {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .text-white {
+            color: #ffffff !important;
+        }
+        .alert-info {
+            background: #374151;
+            border-color: #4b5563;
+            color: #ffffff;
+        }
+        hr {
+            border-color: #404040;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-4 fw-bold" style="color: #10b981;"><i class="fas fa-chart-line"></i> LLM Benchmark Dashboard</h1>
+            <p class="lead" style="color: #9ca3af;">Performance Analysis & Comparison Tool</p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <div class="row">
+                    <div class="col-md-3">
+                        <button id="runBenchmark" class="btn btn-primary btn-run-benchmark w-100" onclick="runBenchmark()">
+                            <i class="fas fa-play"></i> Run Benchmarks
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/comparison" class="btn btn-info w-100 py-3">
+                            <i class="fas fa-columns"></i> Compare Models
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a href="/summary" class="btn btn-success w-100 py-3">
+                            <i class="fas fa-robot"></i> AI Summary
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-secondary w-100 py-3" onclick="location.reload()">
+                            <i class="fas fa-sync"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Benchmark Status -->
+                <div id="benchmarkStatus" class="mt-3" style="display: none;">
+                    <div class="alert alert-info">
+                        <i class="fas fa-spinner fa-spin"></i> <span id="statusText">Running benchmarks...</span>
+                    </div>
+                    <div class="progress">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if has_results %}
+        <!-- Quick Stats -->
+        <div class="row mb-4">
+            {% for model_name, data in results.items() %}
+            {% if data.exists %}
+            <div class="col-md-4">
+                <div class="metric-card">
+                    <h5>{{ model_name }}</h5>
+                    {% if data.metrics.get('Request Latency (ms)') %}
+                    <div class="metric-value">{{ data.metrics['Request Latency (ms)']['avg'] }}</div>
+                    <div class="metric-label">Avg Latency (ms)</div>
+                    {% endif %}
+                    <hr>
+                    {% if data.metrics.get('Output Token Throughput (per sec)') %}
+                    <div><strong>{{ data.metrics['Output Token Throughput (per sec)'] }}</strong> tokens/sec</div>
+                    {% endif %}
+                    <div class="mt-3">
+                        <a href="/model/{{ data.key }}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-info-circle"></i> Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Performance Chart -->
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title"><i class="fas fa-chart-bar"></i> Throughput Comparison</h4>
+                <canvas id="throughputChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Latency Chart -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 class="card-title"><i class="fas fa-chart-line"></i> Latency Comparison</h4>
+                <canvas id="latencyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Detailed Results Table -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h4 class="card-title"><i class="fas fa-table"></i> Detailed Metrics</h4>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Avg Latency</th>
+                                <th>Min Latency</th>
+                                <th>Max Latency</th>
+                                <th>p99 Latency</th>
+                                <th>Throughput</th>
+                                <th>Rank</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for model_name, data in results.items() %}
+                            {% if data.exists and data.metrics.get('Request Latency (ms)') %}
+                            <tr>
+                                <td><strong>{{ model_name }}</strong></td>
+                                <td>{{ data.metrics['Request Latency (ms)']['avg'] }}</td>
+                                <td>{{ data.metrics['Request Latency (ms)']['min'] }}</td>
+                                <td>{{ data.metrics['Request Latency (ms)']['max'] }}</td>
+                                <td>{{ data.metrics['Request Latency (ms)']['p99'] }}</td>
+                                <td>{{ data.metrics.get('Output Token Throughput (per sec)', 'N/A') }} tok/s</td>
+                                <td>
+                                    {% if 'Claude' in model_name %}
+                                    <span class="model-badge winner">1st</span>
+                                    {% elif 'Llama' in model_name %}
+                                    <span class="model-badge second">2nd</span>
+                                    {% else %}
+                                    <span class="model-badge third">3rd</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- No Results Message -->
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-chart-line fa-5x mb-4" style="color: #6b7280;"></i>
+                <h3 style="color: #ffffff;">No Benchmark Results Yet</h3>
+                <p style="color: #9ca3af;">Click "Run Benchmarks" to start testing the models</p>
+                <p style="color: #9ca3af; font-size: 0.9em;">GenAI-Perf connects directly to OpenRouter - no proxy needed</p>
+                <button class="btn btn-lg btn-run-benchmark" onclick="runBenchmark()">
+                    <i class="fas fa-play"></i> Start Benchmarking
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% if has_results %}
+    <script>
+        // Fetch chart data and render charts
+        fetch('/api/chart-data')
+            .then(response => response.json())
+            .then(chartData => {
+                // Throughput Chart
+                const throughputCtx = document.getElementById('throughputChart').getContext('2d');
+                new Chart(throughputCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.throughput.labels,
+                        datasets: [{
+                            label: 'Tokens per Second',
+                            data: chartData.throughput.data,
+                            backgroundColor: [
+                                'rgba(40, 167, 69, 0.8)',
+                                'rgba(255, 193, 7, 0.8)',
+                                'rgba(220, 53, 69, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgba(40, 167, 69, 1)',
+                                'rgba(255, 193, 7, 1)',
+                                'rgba(220, 53, 69, 1)'
+                            ],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Tokens per Second'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+                // Latency Chart
+                const latencyCtx = document.getElementById('latencyChart').getContext('2d');
+                new Chart(latencyCtx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.latency.labels,
+                        datasets: chartData.latency.datasets
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Latency (ms)'
+                                }
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error loading chart data:', error);
+            });
+    </script>
+    {% endif %}
+
+    <script>
+        function runBenchmark() {
+            const btn = document.getElementById('runBenchmark');
+            const statusDiv = document.getElementById('benchmarkStatus');
+            
+            btn.disabled = true;
+            statusDiv.style.display = 'block';
+            
+            fetch('/api/benchmark/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'started') {
+                        checkBenchmarkStatus();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to start benchmark');
+                    btn.disabled = false;
+                    statusDiv.style.display = 'none';
+                });
+        }
+
+        function checkBenchmarkStatus() {
+            const interval = setInterval(() => {
+                fetch('/api/benchmark/status')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('progressBar').style.width = data.progress + '%';
+                        
+                        if (data.logs.length > 0) {
+                            document.getElementById('statusText').textContent = data.logs[data.logs.length - 1];
+                        }
+                        
+                        if (!data.running) {
+                            clearInterval(interval);
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
+                        }
+                    });
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
+
+
