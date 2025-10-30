@@ -14,7 +14,7 @@ pip install -r requirements.txt
 # Open http://localhost:3000 in your browser
 ```
 
-That's it! Use the web interface to run benchmarks and view results.
+Use the web interface to run benchmarks and view results.
 
 ## What This Tool Does
 
