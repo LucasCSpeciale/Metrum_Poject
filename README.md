@@ -5,18 +5,28 @@ A benchmarking tool for comparing LLM performance using OpenRouter and NVIDIA Ge
 ## Quick Start
 
 ```bash
-# 1. Get OpenRouter API key at https://openrouter.ai/keys
+# 1. Clone the repository
+git clone https://github.com/LucasCSpeciale/Metrum_Poject.git
+cd Metrum_Poject
 
-# 2. Set your API key
-export OPENROUTER_API_KEY='sk-or-v1-your-key-here'
+# 2. Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Start the web dashboard
-./start_web_dashboard.sh
+# 4. Get OpenRouter API key at https://openrouter.ai/keys
 
-# 5. Open http://localhost:3000 in your browser
+# 5. Set your API key
+export OPENROUTER_API_KEY='sk-or-v1-your-key-here'
+
+# 6. Make sure Docker Desktop is running
+
+# 7. Start the web dashboard
+bash start_web_dashboard.sh
+
+# 8. Open http://localhost:3000 in your browser
 ```
 
 Use the web interface to run benchmarks and view results.
@@ -42,7 +52,24 @@ Currently configured to test:
 
 ## Installation
 
-### Step 1: Get an OpenRouter API Key
+### Step 1: Create Virtual Environment
+
+```bash
+# Create virtual environment
+python3 -m venv venv
+
+# Activate it
+source venv/bin/activate  # On macOS/Linux
+# OR
+venv\Scripts\activate     # On Windows
+```
+
+You'll need to activate the virtual environment every time you open a new terminal:
+```bash
+source venv/bin/activate
+```
+
+### Step 2: Get an OpenRouter API Key
 
 1. Go to https://openrouter.ai/
 2. Sign up or log in
@@ -50,7 +77,7 @@ Currently configured to test:
 4. Click **Create Key** and copy it
 5. Add credits to your account (at least $5 recommended)
 
-### Step 2: Set Your API Key
+### Step 3: Set Your API Key
 
 **Option A: Temporary (for current terminal session)**
 ```bash
@@ -66,7 +93,7 @@ source ~/.zshrc
 
 **IMPORTANT:** Never commit your actual API key to git!
 
-### Step 3: Install Python Dependencies
+### Step 4: Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -77,7 +104,7 @@ This installs:
 - `flask` - Web server for dashboard
 - `requests` - HTTP client
 
-### Step 4: Verify Docker is Running
+### Step 5: Verify Docker is Running
 
 ```bash
 docker --version
@@ -243,6 +270,35 @@ This creates `BENCHMARK_SUMMARY.md` with:
 
 ## Troubleshooting
 
+### Virtual Environment Issues
+
+**Error:** `command not found: flask` or `ModuleNotFoundError`
+```bash
+# You forgot to activate the virtual environment
+source venv/bin/activate  # macOS/Linux
+# OR
+venv\Scripts\activate     # Windows
+
+# Then verify it's activated - you should see (venv) in your prompt
+```
+
+**Error:** `venv` folder doesn't exist
+```bash
+# Create it first
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Starting Fresh:**
+```bash
+# Delete old venv and recreate
+rm -rf venv
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ### Docker Issues
 
 **Error:** `Cannot connect to the Docker daemon`
@@ -304,7 +360,7 @@ Test/
 ├── start_web_dashboard.sh       # Dashboard launcher
 ├── requirements.txt             # Python dependencies
 ├── README.md                    # This file
-├── Project_Outline.txt          # Original requirements
+├── SETUP.md                     # Step-by-step setup guide
 ├── BENCHMARK_SUMMARY.md         # AI-generated analysis
 ├── templates/                   # HTML templates
 │   ├── index.html              # Main dashboard
