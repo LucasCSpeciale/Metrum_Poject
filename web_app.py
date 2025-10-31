@@ -304,14 +304,6 @@ if __name__ == '__main__':
     print("="*60)
     print("LLM Benchmark Web Dashboard")
     print("="*60)
-    
-    # Check if API key is set
-    if not os.getenv('OPENROUTER_API_KEY'):
-        print("⚠️  WARNING: OPENROUTER_API_KEY not set!")
-        print("   Benchmarks will fail without an API key.")
-        print("   Set it with: export OPENROUTER_API_KEY='your-key'")
-        print("="*60)
-    
     print("Starting server on http://localhost:3000")
     print("Open your browser and navigate to the URL above")
     print("="*60)

@@ -9,21 +9,18 @@ if [ ! -d "venv" ]; then
     exit 1
 fi
 
-# Warn if API key is not set (but don't exit - they can still view existing results)
+# Check if API key is set
 if [ -z "$OPENROUTER_API_KEY" ]; then
     echo "============================================"
-    echo "⚠️  WARNING: OPENROUTER_API_KEY not set!"
+    echo "ERROR: OPENROUTER_API_KEY not set!"
     echo "============================================"
     echo ""
-    echo "You can view existing results, but running"
-    echo "new benchmarks will fail without an API key."
-    echo ""
-    echo "To set your key:"
+    echo "Please set your OpenRouter API key:"
     echo "  export OPENROUTER_API_KEY='sk-or-v1-your-key-here'"
     echo ""
     echo "Get your key at: https://openrouter.ai/keys"
     echo "============================================"
-    echo ""
+    exit 1
 fi
 
 # Check if port 3000 is in use and kill it
