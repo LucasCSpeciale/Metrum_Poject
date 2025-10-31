@@ -144,12 +144,22 @@ def run_benchmark_async():
     benchmark_status['logs'] = ['Starting benchmark...']
     
     try:
-        # Activate venv and run benchmark
+        # Check if API key is set
+        api_key = os.getenv('OPENROUTER_API_KEY')
+        if not api_key:
+            benchmark_status['logs'].append('ERROR: OPENROUTER_API_KEY not set!')
+            benchmark_status['logs'].append('Set it with: export OPENROUTER_API_KEY="your-key"')
+            benchmark_status['running'] = False
+            return
+        
+        # Activate venv and run benchmark (pass through environment)
+        env = os.environ.copy()
         result = subprocess.run(
             ['bash', '-c', 'source venv/bin/activate && python benchmark.py'],
             capture_output=True,
             text=True,
-            cwd=os.getcwd()
+            cwd=os.getcwd(),
+            env=env
         )
         
         if result.returncode == 0:
@@ -294,6 +304,14 @@ if __name__ == '__main__':
     print("="*60)
     print("LLM Benchmark Web Dashboard")
     print("="*60)
+    
+    # Check if API key is set
+    if not os.getenv('OPENROUTER_API_KEY'):
+        print("⚠️  WARNING: OPENROUTER_API_KEY not set!")
+        print("   Benchmarks will fail without an API key.")
+        print("   Set it with: export OPENROUTER_API_KEY='your-key'")
+        print("="*60)
+    
     print("Starting server on http://localhost:3000")
     print("Open your browser and navigate to the URL above")
     print("="*60)
