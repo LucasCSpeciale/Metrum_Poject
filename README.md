@@ -38,7 +38,7 @@ Currently tests:
 ## Requirements
 
 - **Docker Desktop** - Must be installed and running
-- **OpenRouter API Key** - Get at https://openrouter.ai/keys (add $5+ credits)
+- **OpenRouter API Key** - Get at https://openrouter.ai/keys 
 
 ## Using the Dashboard
 
@@ -72,9 +72,10 @@ In `benchmark.py`, modify the GenAI-Perf command:
 ```python
 "--num-dataset-entries", "10",  # Number of test requests
 "--synthetic-input-tokens-mean", "50",  # Average prompt length
+"--concurrency", "10",  # Number of concurrent requests
 ```
 
-**Note:** More prompts = higher cost and longer runtime.
+**Note:** More prompts = higher cost and longer runtime. Higher concurrency increases throughput but may slightly increase latency.
 
 ## Troubleshooting
 

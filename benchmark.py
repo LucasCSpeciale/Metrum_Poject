@@ -78,6 +78,7 @@ def run_genai_perf_benchmark(model_info):
         "--num-dataset-entries", "10",  # Number of test prompts
         "--tokenizer", "gpt2",
         "--measurement-interval", "60000",  # 60 second measurement window (in ms)
+        "--concurrency", "10",  # 10 concurrent requests
         "--artifact-dir", f"/workspace/{output_dir}"
     ]
     

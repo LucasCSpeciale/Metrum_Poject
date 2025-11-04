@@ -62,18 +62,18 @@
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h6 class="text-muted">Avg Latency</h6>
-                        <h3>{{ model_data.metrics['Request Latency (ms)']['avg'] }}</h3>
-                        <small>milliseconds</small>
+                        <h6 class="text-muted">Throughput</h6>
+                        <h3>{{ model_data.metrics.get('Output Token Throughput (per sec)', 'N/A') }}</h3>
+                        <small>tokens/sec</small>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card text-center">
                     <div class="card-body">
-                        <h6 class="text-muted">Throughput</h6>
-                        <h3>{{ model_data.metrics.get('Output Token Throughput (per sec)', 'N/A') }}</h3>
-                        <small>tokens/sec</small>
+                        <h6 class="text-muted">Avg Latency</h6>
+                        <h3>{{ model_data.metrics['Request Latency (ms)']['avg'] }}</h3>
+                        <small>milliseconds</small>
                     </div>
                 </div>
             </div>
