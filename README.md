@@ -18,8 +18,6 @@ docker-compose up
 # 4. Open http://localhost:3000 in your browser
 ```
 
-That's it! No Python environment setup needed.
-
 **Stop the application:** Press Ctrl+C, then run `docker-compose down`
 
 ## Alternative: Native Python Setup
@@ -48,7 +46,7 @@ bash start_web_dashboard.sh
 # 6. Open http://localhost:3000
 ```
 
-**Note:** Docker is required for both methods because GenAI-Perf (the benchmarking tool) runs in containers.
+**Note:** Docker is required for both methods because GenAI-Perf runs in containers.
 
 ## What This Tool Does
 
@@ -71,7 +69,7 @@ Currently tests:
 
 ## Using the Dashboard
 
-1. Click "Run New Benchmark" to test all models (~5-10 minutes)
+1. Click "Run New Benchmark" to test all models (~7-10 minutes)
 2. View interactive comparison charts
 3. Check detailed metrics for each model
 4. Read the AI-generated analysis summary
