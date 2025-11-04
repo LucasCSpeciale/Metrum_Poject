@@ -39,10 +39,11 @@ Thumbs.db
 # Logs
 *.log
 
-# Results (optional - uncomment if you don't want to share benchmark results)
-# results/
-# benchmark_data_summary.json
-# LLM_GENERATED_SUMMARY.md
+# Results - generated files (don't commit)
+results/
+benchmark_data_summary.json
+LLM_GENERATED_SUMMARY.md
+BENCHMARK_SUMMARY.md
 
 # Jupyter Notebook
 .ipynb_checkpoints
