@@ -52,12 +52,18 @@ def run_genai_perf_benchmark(model_info):
     output_dir = Path(f"results/{model_info['key']}")
     output_dir.mkdir(parents=True, exist_ok=True)
     
+    # Determine workspace path for Docker-in-Docker
+    # If running inside Docker, use HOST_WORKSPACE_PATH (host path for Docker socket)
+    # Otherwise use current directory (native execution)
+    workspace_path = os.getenv('HOST_WORKSPACE_PATH', os.getcwd())
+    print(f"Using workspace path: {workspace_path}")
+    
     # Build Docker command for GenAI-Perf
     # Using newer Triton image (25.01) with genai-perf 0.0.10 that has -H flag support
     # Directly connecting to OpenRouter using custom headers 
     cmd = [
         "docker", "run", "--rm",
-        "-v", f"{os.getcwd()}:/workspace",
+        "-v", f"{workspace_path}:/workspace",
         "-w", "/workspace",
         DOCKER_IMAGE,
         "genai-perf", "profile",
@@ -76,25 +82,55 @@ def run_genai_perf_benchmark(model_info):
     ]
     
     try:
-        # Run GenAI-Perf with live output
-        print(f"Running GenAI-Perf for {model_info['name']}...")
-        print(f"Connecting directly to OpenRouter API with custom headers...")
+        # Run GenAI-Perf with simplified output
+        print(f"Benchmarking {model_info['name']}...")
         
-        # Redirect output to both console and log file
-        with open(output_dir / "genai_perf.log", 'w') as log_file:
-            result = subprocess.run(
+        # Run with output to log file only (hide verbose GenAI-Perf logs)
+        log_path = output_dir / "genai_perf.log"
+        with open(log_path, 'w') as log_file:
+            process = subprocess.Popen(
                 cmd,
-                stdout=log_file,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 text=True,
-                timeout=300
+                bufsize=1,
+                universal_newlines=True
             )
+            
+            # Filter output - only show important lines, log everything
+            for line in process.stdout:
+                line = line.rstrip()
+                if line:
+                    # Write all output to log file
+                    log_file.write(line + '\n')
+                    log_file.flush()
+                    
+                    # Skip irrelevant warnings
+                    if 'NVIDIA Driver was not detected' in line:
+                        continue
+                    if 'GPU functionality will not be available' in line:
+                        continue
+                    if 'Use the NVIDIA Container Toolkit' in line:
+                        continue
+                    
+                    # Only print summary tables and important messages to console
+                    if any(keyword in line for keyword in [
+                        'NVIDIA GenAI-Perf',
+                        'Request Latency',
+                        'Throughput',
+                        'Generating',
+                        'ERROR'
+                    ]):
+                        print(line)
+            
+            process.wait(timeout=300)
         
-        if result.returncode != 0:
-            print(f"GenAI-Perf failed for {model_info['name']}")
+        if process.returncode != 0:
+            print(f"\nGenAI-Perf failed for {model_info['name']} with exit code {process.returncode}")
+            print(f"Check log file: {log_path}")
             return None
         
-        print(f"Benchmark completed for {model_info['name']}")
+        print(f"\nBenchmark completed for {model_info['name']}")
         return output_dir
         
     except subprocess.TimeoutExpired:
@@ -102,6 +138,8 @@ def run_genai_perf_benchmark(model_info):
         return None
     except Exception as e:
         print(f"Error running benchmark: {e}")
+        import traceback
+        traceback.print_exc()
         return None
 
 
@@ -161,26 +199,53 @@ def clean_old_results():
     """Clean all old benchmark results before running new benchmarks"""
     results_dir = Path("results")
     
-    print("\nCleaning old benchmark results...")
+    print("\n" + "="*60)
+    print("CLEANING OLD BENCHMARK RESULTS")
+    print("="*60)
     
-    # Clean results directory
+    # Clean results directory contents
     if results_dir.exists():
+        items_cleaned = 0
         for item in results_dir.iterdir():
-            if item.is_dir():
-                shutil.rmtree(item)
-            else:
-                item.unlink()
+            try:
+                if item.is_dir():
+                    print(f"  Removing directory: {item.name}")
+                    shutil.rmtree(item)
+                    items_cleaned += 1
+                else:
+                    print(f"  Removing file: {item.name}")
+                    item.unlink()
+                    items_cleaned += 1
+            except Exception as e:
+                print(f"  Warning: Could not remove {item.name}: {e}")
+        
+        if items_cleaned == 0:
+            print("  No old results to clean")
+        else:
+            print(f"  Cleaned {items_cleaned} items from results/")
     
-    # Clean top-level summary files
+    # Clean top-level summary files (handle both files and directories)
     llm_summary = Path("LLM_GENERATED_SUMMARY.md")
     json_summary = Path("benchmark_data_summary.json")
+    benchmark_summary = Path("BENCHMARK_SUMMARY.md")
     
-    if llm_summary.exists():
-        llm_summary.unlink()
-    if json_summary.exists():
-        json_summary.unlink()
+    for summary_path in [llm_summary, json_summary, benchmark_summary]:
+        if summary_path.exists():
+            try:
+                if summary_path.is_dir():
+                    # Try to clean contents if it's a directory mount
+                    for item in summary_path.iterdir():
+                        if item.is_file():
+                            item.unlink()
+                    print(f"  Cleaned contents of: {summary_path.name}")
+                else:
+                    summary_path.unlink()
+                    print(f"  Removed: {summary_path.name}")
+            except (OSError, PermissionError) as e:
+                # Skip if it's a mounted volume (Docker)
+                print(f"  Note: {summary_path.name} is a mounted volume (will be overwritten)")
     
-    print("Old results cleaned\n")
+    print("="*60 + "\n")
     
     # Ensure results directory exists
     results_dir.mkdir(exist_ok=True)
@@ -216,6 +281,8 @@ def main():
     """Main benchmarking workflow"""
     print("="*60)
     print("LLM Benchmarking with OpenRouter and GenAI-Perf")
+    print("="*60)
+    print("\nThis will take approximately 7-10 minutes to complete...")
     print("="*60)
     
     # Step 1: Clean old results

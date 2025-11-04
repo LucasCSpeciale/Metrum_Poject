@@ -249,15 +249,7 @@
                                 <td>{{ data.metrics['Request Latency (ms)']['max'] }}</td>
                                 <td>{{ data.metrics['Request Latency (ms)']['p99'] }}</td>
                                 <td>{{ data.metrics.get('Output Token Throughput (per sec)', 'N/A') }} tok/s</td>
-                                <td>
-                                    {% if 'Claude' in model_name %}
-                                    <span class="model-badge winner">1st</span>
-                                    {% elif 'Llama' in model_name %}
-                                    <span class="model-badge second">2nd</span>
-                                    {% else %}
-                                    <span class="model-badge third">3rd</span>
-                                    {% endif %}
-                                </td>
+                                <td>-</td>
                             </tr>
                             {% endif %}
                             {% endfor %}
@@ -274,7 +266,6 @@
                 <i class="fas fa-chart-line fa-5x mb-4" style="color: #6b7280;"></i>
                 <h3 style="color: #ffffff;">No Benchmark Results Yet</h3>
                 <p style="color: #9ca3af;">Click "Run Benchmarks" to start testing the models</p>
-                <p style="color: #9ca3af; font-size: 0.9em;">GenAI-Perf connects directly to OpenRouter - no proxy needed</p>
                 <button class="btn btn-lg btn-run-benchmark" onclick="runBenchmark()">
                     <i class="fas fa-play"></i> Start Benchmarking
                 </button>
@@ -368,6 +359,16 @@
             btn.disabled = true;
             statusDiv.style.display = 'block';
             
+            // Hide old results immediately when starting new benchmark
+            const resultsSection = document.querySelector('.row.mt-4');
+            if (resultsSection) {
+                resultsSection.style.opacity = '0.3';
+                resultsSection.style.pointerEvents = 'none';
+            }
+            
+            // Show "clearing old data" message
+            document.getElementById('statusText').textContent = 'Starting new benchmark - clearing old data...';
+            
             fetch('/api/benchmark/start', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
@@ -380,6 +381,10 @@
                     alert('Failed to start benchmark');
                     btn.disabled = false;
                     statusDiv.style.display = 'none';
+                    if (resultsSection) {
+                        resultsSection.style.opacity = '1';
+                        resultsSection.style.pointerEvents = 'auto';
+                    }
                 });
         }
 
@@ -406,5 +411,3 @@
     </script>
 </body>
 </html>
-
-

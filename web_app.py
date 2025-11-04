@@ -139,9 +139,13 @@ def run_benchmark_async():
     """Run benchmark in background thread"""
     global benchmark_status
     
-    benchmark_status['running'] = True
-    benchmark_status['progress'] = 0
-    benchmark_status['logs'] = ['Starting benchmark...']
+    # Reset status completely
+    benchmark_status = {
+        'running': True,
+        'current_model': None,
+        'progress': 0,
+        'logs': ['Starting benchmark...', '']
+    }
     
     try:
         # Check if API key is set
@@ -152,24 +156,47 @@ def run_benchmark_async():
             benchmark_status['running'] = False
             return
         
-        # Activate venv and run benchmark (pass through environment)
+        # Run benchmark directly (Docker has packages pre-installed)
         env = os.environ.copy()
-        result = subprocess.run(
-            ['bash', '-c', 'source venv/bin/activate && python benchmark.py'],
-            capture_output=True,
+        # Force unbuffered Python output so we get real-time logs
+        env['PYTHONUNBUFFERED'] = '1'
+        cmd = 'python -u benchmark.py'
+        
+        benchmark_status['logs'].append('Running benchmark...')
+        benchmark_status['logs'].append(f'Command: {cmd}')
+        benchmark_status['logs'].append('')
+        
+        # Run with real-time output streaming
+        process = subprocess.Popen(
+            ['bash', '-c', cmd],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
             cwd=os.getcwd(),
-            env=env
+            env=env,
+            bufsize=0,  # Unbuffered
+            universal_newlines=True
         )
         
-        if result.returncode == 0:
+        # Stream output in real-time
+        for line in process.stdout:
+            line = line.rstrip()
+            if line:
+                benchmark_status['logs'].append(line)
+                print(line)  # Also print to console
+        
+        process.wait()
+        
+        if process.returncode == 0:
             benchmark_status['logs'].append('Benchmarks completed successfully!')
             benchmark_status['progress'] = 100
         else:
-            benchmark_status['logs'].append(f'Benchmark failed: {result.stderr}')
+            benchmark_status['logs'].append(f'Benchmark failed with exit code: {process.returncode}')
             
     except Exception as e:
         benchmark_status['logs'].append(f'Error: {str(e)}')
+        import traceback
+        benchmark_status['logs'].append(traceback.format_exc())
     finally:
         benchmark_status['running'] = False
         benchmark_status['current_model'] = None

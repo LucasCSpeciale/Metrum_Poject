@@ -134,7 +134,7 @@
                         <tbody>
                             <!-- TTFT Metrics -->
                             <tr class="table-secondary">
-                                <td colspan="5"><strong>Time to First Token (ms - Lower is Better)</strong></td>
+                                <td colspan="{{ results|length + 2 }}"><strong>Time to First Token (ms - Lower is Better)</strong></td>
                             </tr>
                             {% set ttft_metrics = ['avg', 'min', 'max', 'p50', 'p75', 'p90', 'p99'] %}
                             {% for metric in ttft_metrics %}
@@ -151,7 +151,7 @@
 
                             <!-- Latency Metrics -->
                             <tr class="table-secondary">
-                                <td colspan="5"><strong>Request Latency (ms - Lower is Better)</strong></td>
+                                <td colspan="{{ results|length + 2 }}"><strong>Request Latency (ms - Lower is Better)</strong></td>
                             </tr>
                             {% set latency_metrics = ['avg', 'min', 'max', 'p50', 'p75', 'p90', 'p99'] %}
                             {% for metric in latency_metrics %}
@@ -168,7 +168,7 @@
 
                             <!-- Throughput Metrics -->
                             <tr class="table-secondary">
-                                <td colspan="5"><strong>Throughput Metrics (Higher is Better)</strong></td>
+                                <td colspan="{{ results|length + 2 }}"><strong>Throughput Metrics (Higher is Better)</strong></td>
                             </tr>
                             <tr>
                                 <td><strong>Token Throughput (tok/s)</strong></td>
@@ -191,7 +191,7 @@
 
                             <!-- Output Metrics -->
                             <tr class="table-secondary">
-                                <td colspan="5"><strong>Output Characteristics</strong></td>
+                                <td colspan="{{ results|length + 2 }}"><strong>Output Characteristics</strong></td>
                             </tr>
                             {% set output_metrics = ['avg', 'min', 'max'] %}
                             {% for metric in output_metrics %}
@@ -315,5 +315,3 @@
     </script>
 </body>
 </html>
-
-
