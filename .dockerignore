@@ -1,0 +1,21 @@
+# Don't copy these into Docker image
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.git/
+.gitignore
+.DS_Store
+.vscode/
+.idea/
+*.log
+results/*.json
+results/**/genai_perf.log
+

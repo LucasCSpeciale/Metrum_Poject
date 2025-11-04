@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  llm-benchmark:
+    build: .
+    container_name: llm-benchmark-tool
+    ports:
+      - "3000:3000"
+    environment:
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+    volumes:
+      # Mount Docker socket to allow container to run Docker commands
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount results directory to persist data
+      - ./results:/app/results
+      # Mount other generated files
+      - ./BENCHMARK_SUMMARY.md:/app/BENCHMARK_SUMMARY.md
+      - ./LLM_GENERATED_SUMMARY.md:/app/LLM_GENERATED_SUMMARY.md
+    restart: unless-stopped
+    networks:
+      - benchmark-network
+
+networks:
+  benchmark-network:
+    driver: bridge
+
